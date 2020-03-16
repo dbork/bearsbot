@@ -1,15 +1,14 @@
 # Class representing the color of a card
 #
-# Data members
-#   name (str): The full name of the color. 
-#   abbr (str): The abbreviated name of the color.
-#   bgCode (int): IRC code for the background color.
-#   fgCode (int): IRC code for the foreground color, typically 01 (black) or
-#   00 (white).
-#   playCheck (fn: self, UnoBEARS -> bool): Check that determines whether 
-#   cards of this color can be played on cards of another color.
-#   self.playEffect (fn): Side effect of playing a card of this color.
-#   strength (int): How difficult it is to change the color of cards with this
+# name (str): The full name of the color. 
+# abbr (str): The abbreviated name of the color.
+# bgCode (int): IRC code for the background color.
+# fgCode (int): IRC code for the foreground color, typically 01 (black) or 00
+#   (white).
+# playCheck (fn: self, UnoBEARS -> bool): Check that determines whether cards
+#   of this color can be played.
+# playEffect (fn: self, UnoBEARS): Side effect of playing a card of this color.
+# strength (int): How difficult it is to change the color of cards with this
 #   color via the effect of another card.
 
 class Color:
@@ -32,6 +31,7 @@ class Color:
         self.playEffect = playEffect
         self.strength = strength
 
+
     def __str__(self):
         return "\x03{},{}{}\x03".format(
             self.fgCode,
@@ -44,23 +44,21 @@ class Color:
 def standardColorCheck(self, ub):
     return self == ub.currentColor
 
-def freeColorCheck(self, ub):
-    return True
 
 # Standard color effect functions
-def nullColorEffect(self, ub):
-    pass
-
 def purpleEffect(self, ub):
-    ub.say("Color forced to purple! \r\n")
+    ub.say("Color forced to purple!")
+
 
 def wildEffect(self, ub):
     choice = ub.ask(
-        prompt="Choose the color. \r\n",
-        acceptIf=lambda x: x in ub.colors.keys(),
+        message="Choose the color.",
+        player=ub.players[0],
+        acceptIf=lambda x: x.lower() in ub.colors.keys(),
         rejectPrompt=None,
     )
     ub.currentColor = ub.colors[choice]
+
 
 # Initialize the standard colors
 def initColors():
@@ -72,7 +70,7 @@ def initColors():
         bgCode='01',
         fgCode='11',
         playCheck=standardColorCheck,
-        playEffect=nullColorEffect,
+        playEffect=None,
         strength=0,
     )
     colors['b'] = colors['blue']
@@ -83,7 +81,7 @@ def initColors():
         bgCode='01',
         fgCode='04',
         playCheck=standardColorCheck,
-        playEffect=nullColorEffect,
+        playEffect=None,
         strength=0,
     )
     colors['r'] = colors['red']
@@ -94,7 +92,7 @@ def initColors():
         bgCode='01',
         fgCode='09',
         playCheck=standardColorCheck,
-        playEffect=nullColorEffect,
+        playEffect=None,
         strength=0,
     )
     colors['g'] = colors['green']
@@ -105,7 +103,7 @@ def initColors():
         bgCode='01',
         fgCode='08',
         playCheck=standardColorCheck,
-        playEffect=nullColorEffect,
+        playEffect=None,
         strength=0,
     )
     colors['y'] = colors['yellow']
@@ -115,7 +113,7 @@ def initColors():
         abbr='w',
         bgCode='00',
         fgCode='14',
-        playCheck=freeColorCheck,
+        playCheck=None,
         playEffect=wildEffect,
         strength=2,
     )
@@ -127,7 +125,7 @@ def initColors():
         bgCode='00',
         fgCode='01',
         playCheck=standardColorCheck,
-        playEffect=nullColorEffect,
+        playEffect=None,
         strength=2,
     )
     colors['k'] = colors['black']
@@ -137,7 +135,7 @@ def initColors():
         abbr='p',
         bgCode='00',
         fgCode='06',
-        playCheck=freeColorCheck,
+        playCheck=None,
         playEffect=purpleEffect,
         strength=1,
     )
