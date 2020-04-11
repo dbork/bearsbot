@@ -1,16 +1,14 @@
 from cardtype import CardType
 from color import Color
 
-# Card class
+# Card class. Unlike for card types and colors, each card is stored in its
+# own object. Thus, a card can locally change the type of color of another 
+# card, or globally modify the properties of types and colors.
 #
 # cardType (CardType): The type of the card.
 # color (Color): The color of the card.
-# 
-# Note that both of these are references to global objects stores in the
-# top-level UnoBEARS object; thus, a card can theoretically modify the global
-# properties of a color or card type.
 
-class Card:
+class Card(object):
 
     def __init__(
         self,
@@ -22,18 +20,16 @@ class Card:
 
 
     def __str__(self):
-        return "\x03{},{}{}{}\x03".format(
+        return "\x03{},{}{}\x03".format(
             self.color.fgCode,
             self.color.bgCode,
-            self.cardType.name,
-            self.color.abbr,
+            self.name(),
         )
 
 
-# Helper function for creating a card from a string
-def cardFromString(string, cardTypes, colors):
-    return Card(
-        cardType=cardTypes[string[:-1]],
-        color=colors[string[-1]],
-    )
+    # Gets the string representation without IRC formatting. This needs to be
+    # a function, rather than a data member, so that it will respect cardType
+    # and color changes.
+    def name(self):
+        return self.cardType.name + self.color.abbr
 

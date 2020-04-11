@@ -1,3 +1,7 @@
+# This is unused, but is a hack put in place to preserve patch stealth by
+# making absolutely sure I remember to load the virtualenv before running uno
+import ircmessage
+
 import sys
 import socket
 import string
@@ -36,7 +40,7 @@ while 1:
         if (line[0] == "PING"):
             s.send("PONG %s\r\n" % line[1])
             # if bearsbot isn't joining and you're desperate, uncomment this
-            #s.send("JOIN %s\r\n" % CHAN)
+            s.send("JOIN %s\r\n" % CHAN)
 
         if 'JOIN' in line:
             user = line[0].lstrip(':')

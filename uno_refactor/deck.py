@@ -1,13 +1,19 @@
-from card import cardFromString
+import copy
+import random
 
-# Initialize the standard decks.
-def initDecks(types, colors):
-    decks = {}
+# Class representing a deck.
+#
+# cards (list(card)): The list of cards in the deck.
 
-    standardDeck = ['6b']
-    decks['standard'] = [
-        cardFromString(string, types, colors) for string in standardDeck
-    ]
+class Deck(object):
 
-    return decks
+    def __init__(
+        self,
+        cards,
+    ):
+        self.cards = cards
+
+
+    def drawOne(self):
+        return copy.copy(random.choice(self.cards))
 
