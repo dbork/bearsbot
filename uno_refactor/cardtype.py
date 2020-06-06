@@ -52,6 +52,8 @@ class CardTypeSkip(CardType):
     def playEffect(self, ub):
         ub.say("{} has been skipped!".format(ub.currentPlayer))
         ub.players = ub.players[1:] + [ub.players[0]]
+        # TODO: ub.currentPlayer should maybe be a function, so we don't have
+        # to constantly do this
         ub.currentPlayer = ub.players[0]
 
 
@@ -69,7 +71,9 @@ class CardTypeDiscardAll(CardType):
 
     def playEffect(self, ub):
         ub.say("All cards of the same color discarded!")
-        ub.currentPlayer.discard(ub=ub, limit=None, color=ub.topCard.color)
+        # This (as opposed to topCard.color) is v&7 behavior; dallw changes
+        # the color and then discards all cards of the new color.
+        ub.currentPlayer.discard(ub=ub, limit=None, color=ub.currentColor)
 
 
 class CardTypeShuffleDeck(CardType):
@@ -156,8 +160,8 @@ class CardTypeMultipleWild(CardType):
 class CardTypePurple(CardType):
 
     def playEffect(self, ub):
-        # Check for victory before doing the effect, to avoid getting stuck
-        # asking a player to choose a card from an empty hand.
+        # Check for an empty hand before doing the effect, to avoid getting
+        # stuck asking a player to choose a card when they don't have any.
         if len(ub.currentPlayer.hand) == 0:
             return
 
@@ -189,8 +193,8 @@ class CardTypePurple(CardType):
 class CardTypeSelfApply(CardType):
 
     def playEffect(self, ub):
-        # Check for victory before doing the effect, to avoid getting stuck
-        # asking a player to choose a card from an empty hand.
+        # Check for an empty hand before doing the effect, to avoid getting
+        # stuck asking a player to choose a card when they don't have any.
         if len(ub.currentPlayer.hand) == 0:
             return
 
@@ -214,7 +218,7 @@ class CardTypeSelfApply(CardType):
         # (errata: it's ok in v&7...because all exek does is change the false
         # color to purple. not that that's /good/ behavior lol. but also we
         # /can't/ just run the exek effect in sap-land because there's no way
-        # to force it to only accept penalties/fast defensives...
+        # to force it to only accept penalties/fast defensives...)
         # we might need to add a 'defensiveEffect' flag just to deal with 
         # sap...exek, shld, and skip (at least) should all be playable, but
         # only if their effects are fast enough to actually deflect the
@@ -235,16 +239,23 @@ class CardTypeSelfApply(CardType):
 
         # so i think there are two basic choices here:
         # a) drop a ton of special-casing in ub (isLegalPlay and applyPenalties
-        # at least) and both card (exe) and color (w, p) effects and try to
-        # re-use everything while storing the old false color, top card, and
+        # at least) and both card (exe, shld) and color (w, p) effects and try 
+        # to re-use everything while storing the old false color, top card, and
         # penalties (and prev color for purple? ugh) via some kind of global
-        # ub.isSelfApplying flag
+        # ub.isSelfApplying flag. also the self-apply 'turns' should /not/
+        # count as turns for the purposes of, eg, whtb spread, so ub.doTurn
+        # might need special-casing for that too if we use it
         # b) rebuild the run loop here with special-casing as in v&7, which
         # at least means all the special-casing will be in one location in the
         # code, but which would involve horrible hacks like not calling the
         # exe or w/p effects directly, which would be incompatible with those
         # effects potentially being changed by other cards
         # and i don't like either of them...
+        # c) generalize by adding 'modes', so the sap mode is drawless,
+        # doesn't change players, bans cards that are neither penalties
+        # nor fast defensives, and lasts until response == 'done'. other modes
+        # might last for a certain number of turns, or until some other
+        # condition is met.
         raise NotImplementedError
 
 

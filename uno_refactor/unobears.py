@@ -183,6 +183,11 @@ class UnoBEARS(object):
     # Do the current player's turn. This operates on self.currentPlayer rather
     # than taking a player as input because some cards (notably skip) can
     # change this mid-turn
+    #
+    # Returns:
+    # response: the valid card-playing response given by the player, which some 
+    #   routines (sap effect, quitting when response == 'q') need to process.
+
     def doTurn(self):
         while 1:
             response = self.ask(
@@ -287,9 +292,9 @@ class UnoBEARS(object):
                     if self.topCard.cardType.speed == 0:
                         self.topCard.cardType.playEffect(self)
 
-                    return
+                    # TODO: handle response == 'quit'?
+                    return response
 
-            # TODO: handle response == 'quit'?
             self.say("Invalid move.")
 
 

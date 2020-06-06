@@ -1,0 +1,8 @@
+uno_refactor/venv/*
+.DS_Store
+*.out
+*.pyc
+*.txt
+*.zip
+*#
+*~
